@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(cuid())
+  name             String
+  email            String            @unique
+  password         String
+  role             String            @default("RECEPTIONIST")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  technicianNotes  TechnicianNote[]
+  repairOrders     RepairOrder[]     @relation("CreatedBy")
+  statusHistory    RepairStatusHistory[] @relation("ChangedBy")
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  fullName    String
+  phone1      String
+  phone2      String?
+  address     String
+  email       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  devices     Device[]
+}
+
+model Device {
+  id                String         @id @default(cuid())
+  customerId        String
+  customer          Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  category          String
+  brand             String
+  model             String
+  serialNumber      String?
+  physicalCondition String
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  repairOrders      RepairOrder[]
+}
+
+model RepairOrder {
+  id            String             @id @default(cuid())
+  dossierNumber String             @unique // ITB-yyyy-xxxx
+  deviceId      String
+  device        Device             @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  description   String
+  urgency       String             @default("MOYEN")
+  accessories   String             @default("") // Chargeur, Batterie, etc. JSON string or comma-separated list
+  createdById   String
+  createdBy     User               @relation("CreatedBy", fields: [createdById], references: [id])
+  status        String             @default("RECU")
+  receptionDate DateTime           @default(now())
+  signatureUrl  String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  statusHistory RepairStatusHistory[]
+  notes         TechnicianNote[]
+}
+
+model RepairStatusHistory {
+  id            String      @id @default(cuid())
+  repairOrderId String
+  repairOrder   RepairOrder @relation(fields: [repairOrderId], references: [id], onDelete: Cascade)
+  status        String
+  changedAt     DateTime    @default(now())
+  changedById   String
+  changedBy     User        @relation("ChangedBy", fields: [changedById], references: [id])
+}
+
+model TechnicianNote {
+  id            String      @id @default(cuid())
+  repairOrderId String
+  repairOrder   RepairOrder @relation(fields: [repairOrderId], references: [id], onDelete: Cascade)
+  technicianId  String
+  technician    User        @relation(fields: [technicianId], references: [id])
+  note          String
+  createdAt     DateTime    @default(now())
+}
