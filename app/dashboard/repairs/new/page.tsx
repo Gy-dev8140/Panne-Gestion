@@ -192,7 +192,7 @@ export default function NewRepairOrderPage() {
 
             <div className="space-y-2">
               <Label>Niveau d'urgence *</Label>
-              <Select onValueChange={(val) => form.setValue('repair.urgency', val)} defaultValue="MOYEN">
+              <Select onValueChange={(val) => form.setValue('repair.urgency', val ?? '')} defaultValue="MOYEN">
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner l'urgence" />
                 </SelectTrigger>
