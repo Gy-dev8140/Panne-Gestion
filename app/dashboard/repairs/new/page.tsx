@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -132,20 +132,26 @@ export default function NewRepairOrderPage() {
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Catégorie *</Label>
-              <Select onValueChange={(val) => form.setValue('device.category', val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner une catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ORDINATEUR_PORTABLE">Ordinateur portable</SelectItem>
-                  <SelectItem value="ORDINATEUR_BUREAU">Ordinateur de bureau</SelectItem>
-                  <SelectItem value="IMPRIMANTE">Imprimante</SelectItem>
-                  <SelectItem value="TELEPHONE">Téléphone</SelectItem>
-                  <SelectItem value="TABLETTE">Tablette</SelectItem>
-                  <SelectItem value="RESEAU">Réseau</SelectItem>
-                  <SelectItem value="AUTRE">Autre</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="device.category"
+                control={form.control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une catégorie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ORDINATEUR_PORTABLE">Ordinateur portable</SelectItem>
+                      <SelectItem value="ORDINATEUR_BUREAU">Ordinateur de bureau</SelectItem>
+                      <SelectItem value="IMPRIMANTE">Imprimante</SelectItem>
+                      <SelectItem value="TELEPHONE">Téléphone</SelectItem>
+                      <SelectItem value="TABLETTE">Tablette</SelectItem>
+                      <SelectItem value="RESEAU">Réseau</SelectItem>
+                      <SelectItem value="AUTRE">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {form.formState.errors.device?.category && <p className="text-sm text-red-500">{form.formState.errors.device.category.message}</p>}
             </div>
             <div className="space-y-2">
